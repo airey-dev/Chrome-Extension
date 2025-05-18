@@ -1,7 +1,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"
 import { getDatabase,
          ref,
-         push } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js"
+         push,
+         onValue,
+         remove } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js"
 
 const firebaseConfig = {
     databaseURL: process.env.DATABASE_URL
@@ -30,12 +32,21 @@ function render(leads) {
     ulEl.innerHTML = listItems
 }
 
+onValue(referenceInDB, function(snapshot) {
+    const snapshotDoesExist = snapshot.exists()
+    if (snapshotDoesExist) {
+        const snapshotValues = snapshot.val()
+        const leads = Object.values(snapshotValues)
+        render(leads)
+    }
+})
+
 deleteBtn.addEventListener("dblclick", function() {
-    
+    remove(referenceInDB)
+    ulEl.innerHTML = ""
 })
 
 inputBtn.addEventListener("click", function() {
     push(referenceInDB, inputEl.value)
-    // Challenge: Import the 'push' function and modify the line above to push inputEl.value to the referenceInDB in the database
-    inputEl.value = ""
+    inputEl.value = "" 
 })
